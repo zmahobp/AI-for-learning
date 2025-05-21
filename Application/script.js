@@ -4,46 +4,46 @@ config();
 import { OpenAI } from "openai";
 import readline from "readline";
 
+//This function wraps the initialization of the openai object through which communication
+//with the LLM model is performed
 var openai;
 var userInterface;
-//funkcija u koju je upakovano inicijalizovanje openai objekta preko kog se vrsti komunikacija
-//sa LLM modelom
 function Initialize()
 {
-    //konstruisanje objekta preko koga mozemo da pozivamo funkije modela
-    //generisani API_KEY prosledjujemo u konstruktoru
+    //constructing the object through which we can call model functions
+    //the generated API_KEY is passed to the constructor
     openai = new OpenAI({
         apiKey: process.env.API_KEY
     });
 
-    //definisemo kako ce da izgleda user interface, imace ulaz i izlaz
+    //define what the user interface will look like, it will have input and output
     userInterface = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
     });
 }
 
-//funkcija u koju je upakovana funkcionalnost interakcija korisnika i modela putem konzole
+//This function encapsulates the functionality for user and model interaction via the console
 function StartChat()
 {
-    //kreiramo novi prompt koji se prikazuje korisniku
+    // create a new prompt that is displayed to the user
     userInterface.prompt();
 
-    //obrada dogadjaja kada se upise nova poruka u user interface
+    // event handler when a new message is entered in the user interface
     userInterface.on("line", async (input) => {
-            //ovde se poziva funkcija za razmenu poruka openai.chat.completions.create
-            //navodi se model koji se koristi i format poruke
-            //poruka sadrzi ko je poslao i njen sadrzaj
+            // here the function for exchanging messages openai.chat.completions.create is called
+            // specify the model used and the message format
+            // the message contains who sent it and its content
             const res = await openai.chat.completions.create({
                 model: "gpt-3.5-turbo-1106",
                 messages: [{role:"user", content: input }],
             });
             
-            //u koznoli se prikazuje samo onaj podatak povratne vrednosti koji predstavlja
-            //tekstualni sadrzaj odgovora modela
+            // in the console, only the part of the return value that represents
+            // the textual content of the model's response is displayed
             console.log(res.data.choices[0].message.content);
 
-            //zatim se prompt ponovo poziva kako bi mogla da se unese sledeca poruka
+            // then the prompt is called again so that the next message can be entered
             userInterface.prompt();
     });
 }
